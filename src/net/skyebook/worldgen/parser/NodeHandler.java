@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import net.skyebook.osmutils.Node;
 import net.skyebook.osmutils.NodeWayRelationBaseObject;
+import net.skyebook.osmutils.Relation;
+import net.skyebook.osmutils.Way;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -20,17 +22,34 @@ import org.xml.sax.helpers.DefaultHandler;
 public class NodeHandler extends DefaultHandler {
 
     private XMLReader reader;
+    private OSMParser parent;
     private HashMap<Long, Node> nodeCache;
     private StringBuilder content;
     private Node node;
     private List<NodeWayRelationBaseObject> objects;
 
-    public NodeHandler(XMLReader reader, HashMap<Long, Node> nodeCache, List<NodeWayRelationBaseObject> objects) {
+    public NodeHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
+        this.parent = parent;
         this.nodeCache = nodeCache;
         this.objects = objects;
         this.content = new StringBuilder();
         this.node = new Node();
+
+        String id = attributes.getValue("id");
+        node.setId(Long.parseLong(id));
+        node.setUser(attributes.getValue("user"));
+        node.setUid(Integer.parseInt(attributes.getValue("uid")));
+        node.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
+        node.setVersion(Integer.parseInt(attributes.getValue("version")));
+        // TODO: Visible
+        node.setTimestamp(parseDate(attributes.getValue("timestamp")));
+
+        node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
+        node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+
+        objects.add(node);
+        nodeCache.put(node.getId(), node);
     }
 
     @Override
@@ -41,28 +60,20 @@ public class NodeHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         content.setLength(0);
+        //System.out.println("Node Start " + name);
         if (name.equals("tag")) {
-            reader.setContentHandler(new TagHandler(reader, node.getTags()));
+            //System.out.println("Found Tag");
+            reader.setContentHandler(new TagHandler(reader, this, node.getTags()));
         }
         if (name.equals("node")) {
-            String id = attributes.getValue("id");
-            node.setId(Long.parseLong(id));
-            node.setUser(attributes.getValue("user"));
-            node.setUid(Integer.parseInt(attributes.getValue("uid")));
-            node.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
-            node.setVersion(Integer.parseInt(attributes.getValue("version")));
-            // TODO: Visible
-            node.setTimestamp(parseDate(attributes.getValue("timestamp")));
-
-            node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
-            node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
-
-            objects.add(node);
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
+        if (name.equals("node")) {
+            reader.setContentHandler(parent);
+        }
     }
 
     /**

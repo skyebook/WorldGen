@@ -6,7 +6,6 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import net.skyebook.osmutils.Node;
 import net.skyebook.osmutils.NodeWayRelationBaseObject;
 import net.skyebook.worldgen.parser.OSMParser;
 import org.xml.sax.SAXException;
@@ -24,9 +23,5 @@ public class XMLParserTest {
         saxParser.parse(new File("test_data/map.osm.xml"), parser);
         List<NodeWayRelationBaseObject> objects = parser.getObjects();
         System.out.println("Parsed " + objects.size() + " objects");
-        for(NodeWayRelationBaseObject object : objects){
-            System.out.println(object.getClass().getName());
-            System.out.println(((Node)object).getId());
-        }
     }
 }

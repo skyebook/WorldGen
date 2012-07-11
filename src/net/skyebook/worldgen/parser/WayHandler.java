@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import net.skyebook.osmutils.Node;
 import net.skyebook.osmutils.NodeWayRelationBaseObject;
+import net.skyebook.osmutils.Relation;
 import net.skyebook.osmutils.Way;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -21,17 +22,30 @@ import org.xml.sax.helpers.DefaultHandler;
 public class WayHandler extends DefaultHandler {
 
     private XMLReader reader;
+    private OSMParser parent;
     private HashMap<Long, Node> nodeCache;
     private StringBuilder content;
     private Way way;
     private List<NodeWayRelationBaseObject> objects;
 
-    public WayHandler(XMLReader reader, HashMap<Long, Node> nodeCache, List<NodeWayRelationBaseObject> objects) {
+    public WayHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
+        this.parent = parent;
         this.nodeCache = nodeCache;
         this.objects = objects;
         this.content = new StringBuilder();
         this.way = new Way();
+        String id = attributes.getValue("id");
+        way.setId(Long.parseLong(id));
+        way.setUser(attributes.getValue("user"));
+        way.setUid(Integer.parseInt(attributes.getValue("uid")));
+        way.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
+        way.setVersion(Integer.parseInt(attributes.getValue("version")));
+        // TODO: Visible
+        way.setTimestamp(parseDate(attributes.getValue("timestamp")));
+        
+        objects.add(way);
+        wayCache.put(way.getId(), way);
     }
 
     @Override
@@ -44,9 +58,10 @@ public class WayHandler extends DefaultHandler {
         content.setLength(0);
 
         if (name.equals("tag")) {
-            reader.setContentHandler(new TagHandler(reader, way.getTags()));
+            reader.setContentHandler(new TagHandler(reader, this, way.getTags()));
         }
         if (name.equals("nd")) {
+            //System.out.println("Found Way Member");
             long nodeID = Long.parseLong(attributes.getValue("ref"));
             Node node = nodeCache.get(nodeID);
             if (node != null) {
@@ -57,22 +72,15 @@ public class WayHandler extends DefaultHandler {
             }
         }
         if (name.equals("way")) {
-            String id = attributes.getValue("id");
-            way.setId(Long.parseLong(id));
-            way.setUser(attributes.getValue("user"));
-            way.setUid(Integer.parseInt(attributes.getValue("uid")));
-            way.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
-            way.setVersion(Integer.parseInt(attributes.getValue("version")));
-            // TODO: Visible
-            way.setTimestamp(parseDate(attributes.getValue("timestamp")));
-
-            objects.add(way);
         }
 
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
+        if (name.equals("way")) {
+            reader.setContentHandler(parent);
+        }
     }
 
     /**

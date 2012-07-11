@@ -22,6 +22,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class RelationHandler extends DefaultHandler {
 
     private XMLReader reader;
+    private OSMParser parent;
     private HashMap<Long, Node> nodeCache;
     private HashMap<Long, Way> wayCache;
     private HashMap<Long, Relation> relationCache;
@@ -29,14 +30,27 @@ public class RelationHandler extends DefaultHandler {
     private Relation relation;
     private List<NodeWayRelationBaseObject> objects;
 
-    public RelationHandler(XMLReader reader, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects) {
+    public RelationHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
+        this.parent = parent;
         this.nodeCache = nodeCache;
         this.wayCache = wayCache;
         this.relationCache = relationCache;
         this.objects = objects;
         this.content = new StringBuilder();
         this.relation = new Relation();
+
+        String id = attributes.getValue("id");
+        relation.setId(Long.parseLong(id));
+        relation.setUser(attributes.getValue("user"));
+        relation.setUid(Integer.parseInt(attributes.getValue("uid")));
+        relation.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
+        relation.setVersion(Integer.parseInt(attributes.getValue("version")));
+        // TODO: Visible
+        relation.setTimestamp(parseDate(attributes.getValue("timestamp")));
+
+        objects.add(relation);
+        relationCache.put(relation.getId(), relation);
     }
 
     @Override
@@ -49,10 +63,11 @@ public class RelationHandler extends DefaultHandler {
         content.setLength(0);
 
         if (name.equals("tag")) {
-            reader.setContentHandler(new TagHandler(reader, relation.getTags()));
+            reader.setContentHandler(new TagHandler(reader, this, relation.getTags()));
         }
         if (name.equals("member")) {
-            long memberID = Long.parseLong(attributes.getValue("id"));
+            //System.out.println("Found Relation Member");
+            long memberID = Long.parseLong(attributes.getValue("ref"));
             String type = attributes.getValue("type");
             String role = attributes.getValue("role");
             if (type.equals("node")) {
@@ -84,22 +99,15 @@ public class RelationHandler extends DefaultHandler {
             }
         }
         if (name.equals("relation")) {
-            String id = attributes.getValue("id");
-            relation.setId(Long.parseLong(id));
-            relation.setUser(attributes.getValue("user"));
-            relation.setUid(Integer.parseInt(attributes.getValue("uid")));
-            relation.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
-            relation.setVersion(Integer.parseInt(attributes.getValue("version")));
-            // TODO: Visible
-            relation.setTimestamp(parseDate(attributes.getValue("timestamp")));
-
-            objects.add(relation);
         }
 
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
+        if (name.equals("relation")) {
+            reader.setContentHandler(parent);
+        }
     }
 
     /**

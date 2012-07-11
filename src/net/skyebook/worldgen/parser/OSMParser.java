@@ -35,16 +35,16 @@ public class OSMParser extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         if (name.equals("node")) {
-            // Switch handler to parse the team element
-            reader.setContentHandler(new NodeHandler(reader, nodeCache, objects));
+            //System.out.println("Found Node");
+            reader.setContentHandler(new NodeHandler(reader, this, nodeCache, wayCache, relationCache, objects, attributes));
         }
         else if (name.equals("way")) {
-            // Switch handler to parse the team element
-            reader.setContentHandler(new WayHandler(reader, nodeCache, objects));
+            //System.out.println("Found Way");
+            reader.setContentHandler(new WayHandler(reader, this, nodeCache, wayCache, relationCache, objects, attributes));
         }
         else if (name.equals("relation")) {
-            // Switch handler to parse the team element
-            reader.setContentHandler(new RelationHandler(reader, nodeCache, wayCache, relationCache, objects));
+            //System.out.println("Found Relation");
+            reader.setContentHandler(new RelationHandler(reader, this, nodeCache, wayCache, relationCache, objects, attributes));
         }
     }
     
