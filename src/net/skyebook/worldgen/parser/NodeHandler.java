@@ -22,13 +22,13 @@ import org.xml.sax.helpers.DefaultHandler;
 public class NodeHandler extends DefaultHandler {
 
     private XMLReader reader;
-    private OSMParser parent;
+    private OSMHandler parent;
     private HashMap<Long, Node> nodeCache;
     private StringBuilder content;
     private Node node;
     private List<NodeWayRelationBaseObject> objects;
 
-    public NodeHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
+    public NodeHandler(XMLReader reader, OSMHandler parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
         this.parent = parent;
         this.nodeCache = nodeCache;

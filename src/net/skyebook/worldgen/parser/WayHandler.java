@@ -22,13 +22,13 @@ import org.xml.sax.helpers.DefaultHandler;
 public class WayHandler extends DefaultHandler {
 
     private XMLReader reader;
-    private OSMParser parent;
+    private OSMHandler parent;
     private HashMap<Long, Node> nodeCache;
     private StringBuilder content;
     private Way way;
     private List<NodeWayRelationBaseObject> objects;
 
-    public WayHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
+    public WayHandler(XMLReader reader, OSMHandler parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
         this.parent = parent;
         this.nodeCache = nodeCache;
@@ -68,7 +68,7 @@ public class WayHandler extends DefaultHandler {
                 way.getMembers().add(node);
             }
             else {
-                System.out.println("ERROR: Node " + nodeID + " not found in cache");
+                //System.out.println("ERROR: Node " + nodeID + " not found in cache");
             }
         }
         if (name.equals("way")) {

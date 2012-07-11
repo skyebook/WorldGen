@@ -22,7 +22,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class RelationHandler extends DefaultHandler {
 
     private XMLReader reader;
-    private OSMParser parent;
+    private OSMHandler parent;
     private HashMap<Long, Node> nodeCache;
     private HashMap<Long, Way> wayCache;
     private HashMap<Long, Relation> relationCache;
@@ -30,7 +30,7 @@ public class RelationHandler extends DefaultHandler {
     private Relation relation;
     private List<NodeWayRelationBaseObject> objects;
 
-    public RelationHandler(XMLReader reader, OSMParser parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
+    public RelationHandler(XMLReader reader, OSMHandler parent, HashMap<Long, Node> nodeCache, HashMap<Long, Way> wayCache, HashMap<Long, Relation> relationCache, List<NodeWayRelationBaseObject> objects, Attributes attributes) {
         this.reader = reader;
         this.parent = parent;
         this.nodeCache = nodeCache;
@@ -76,7 +76,7 @@ public class RelationHandler extends DefaultHandler {
                     relation.getMembers().add(node);
                 }
                 else {
-                    System.out.println("ERROR: Node " + memberID + " not found in cache");
+                    //System.out.println("ERROR: Node " + memberID + " not found in cache");
                 }
             }
             else if (type.equals("way")) {
@@ -85,7 +85,7 @@ public class RelationHandler extends DefaultHandler {
                     relation.getMembers().add(way);
                 }
                 else {
-                    System.out.println("ERROR: Way " + memberID + " not found in cache");
+                    //System.out.println("ERROR: Way " + memberID + " not found in cache");
                 }
             }
             else if (type.equals("relation")) {
@@ -94,7 +94,7 @@ public class RelationHandler extends DefaultHandler {
                     relation.getMembers().add(rel);
                 }
                 else {
-                    System.out.println("ERROR: Relation " + memberID + " not found in cache");
+                    //System.out.println("ERROR: Relation " + memberID + " not found in cache");
                 }
             }
         }

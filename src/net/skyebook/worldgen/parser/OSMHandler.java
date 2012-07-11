@@ -13,10 +13,11 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
+ * Handles the OSM root element
  *
  * @author Skye Book
  */
-public class OSMParser extends DefaultHandler {
+public class OSMHandler extends DefaultHandler {
 
     private HashMap<Long, Node> nodeCache;
     private HashMap<Long, Way> wayCache;
@@ -24,7 +25,7 @@ public class OSMParser extends DefaultHandler {
     private XMLReader reader;
     private List<NodeWayRelationBaseObject> objects;
 
-    public OSMParser(XMLReader reader) {
+    public OSMHandler(XMLReader reader) {
         this.reader = reader;
         this.nodeCache = new HashMap<Long, Node>();
         this.wayCache = new HashMap<Long, Way>();
@@ -46,9 +47,13 @@ public class OSMParser extends DefaultHandler {
             //System.out.println("Found Relation");
             reader.setContentHandler(new RelationHandler(reader, this, nodeCache, wayCache, relationCache, objects, attributes));
         }
+        else if (name.equals("bounds")) {
+            //System.out.println("Found Relation");
+            reader.setContentHandler(new BoundsHandler(reader, this, attributes));
+        }
     }
-    
-    public List<NodeWayRelationBaseObject> getObjects(){
+
+    public List<NodeWayRelationBaseObject> getObjects() {
         return objects;
     }
 }
