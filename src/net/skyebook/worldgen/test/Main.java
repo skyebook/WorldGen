@@ -15,6 +15,10 @@ import net.skyebook.tmsvec3f.LatLon;
  * @author normenhansen
  */
 public class Main extends SimpleApplication {
+    
+    private CamRegistrationTMSAppState tms;
+    
+    private int count = 0;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -28,8 +32,8 @@ public class Main extends SimpleApplication {
 	cam.setFrustumFar(10000);
         
         // This keeps the camera synchronized with a coordinate system
-	CamRegistrationTMSAppState tmsAppState = new CamRegistrationTMSAppState(new LatLon(40, -75), 15, 10);
-	stateManager.attach(tmsAppState);
+	tms = new CamRegistrationTMSAppState(new LatLon(40, -75), 15, 10);
+	stateManager.attach(tms);
         
         Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         Geometry geom = new Geometry("Box", b);
@@ -43,7 +47,14 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-        //TODO: add update code
+        if(count==60){
+            LatLon coordinate = tms.getCoordinateSystem().getLocationCoordinate(cam.getLocation());
+            System.out.println("Camera at " + coordinate);
+            count=0;
+        }
+        else{
+            count++;
+        }
     }
 
     @Override
