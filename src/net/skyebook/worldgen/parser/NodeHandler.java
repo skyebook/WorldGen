@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.skyebook.worldgen.parser;
 
 import java.text.DateFormat;
@@ -9,7 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import net.skyebook.osmutils.Node;
+import net.skyebook.osmutils.NodeWayRelationBaseObject;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -25,10 +23,12 @@ public class NodeHandler extends DefaultHandler {
     private HashMap<Long, Node> nodeCache;
     private StringBuilder content;
     private Node node;
+    private List<NodeWayRelationBaseObject> objects;
 
-    public NodeHandler(XMLReader reader, HashMap<Long, Node> nodeCache) {
+    public NodeHandler(XMLReader reader, HashMap<Long, Node> nodeCache, List<NodeWayRelationBaseObject> objects) {
         this.reader = reader;
         this.nodeCache = nodeCache;
+        this.objects = objects;
         this.content = new StringBuilder();
         this.node = new Node();
     }
@@ -41,26 +41,28 @@ public class NodeHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         content.setLength(0);
-        String id = attributes.getValue("id");
-        node.setId(Long.parseLong(id));
-        node.setUser(attributes.getValue("user"));
-        node.setUid(Integer.parseInt(attributes.getValue("uid")));
-        node.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
-        node.setVersion(Integer.parseInt(attributes.getValue("version")));
-        // TODO: Visible
-        node.setTimestamp(parseDate(attributes.getValue("timestamp")));
+        if (name.equals("tag")) {
+            reader.setContentHandler(new TagHandler(reader, node.getTags()));
+        }
+        if (name.equals("node")) {
+            String id = attributes.getValue("id");
+            node.setId(Long.parseLong(id));
+            node.setUser(attributes.getValue("user"));
+            node.setUid(Integer.parseInt(attributes.getValue("uid")));
+            node.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
+            node.setVersion(Integer.parseInt(attributes.getValue("version")));
+            // TODO: Visible
+            node.setTimestamp(parseDate(attributes.getValue("timestamp")));
 
-        node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
-        node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+            node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
+            node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+
+            objects.add(node);
+        }
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
-        if (name.equals("tag")) {
-            HashMap<String, String> tags = new HashMap<String, String>();
-            node.setTags(tags);
-            reader.setContentHandler(new TagHandler(reader, tags));
-        }
     }
 
     /**

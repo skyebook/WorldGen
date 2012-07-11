@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import net.skyebook.osmutils.Node;
 import net.skyebook.osmutils.NodeWayRelationBaseObject;
+import net.skyebook.osmutils.Relation;
+import net.skyebook.osmutils.Way;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -17,19 +19,31 @@ import org.xml.sax.helpers.DefaultHandler;
 public class OSMParser extends DefaultHandler {
 
     private HashMap<Long, Node> nodeCache;
+    private HashMap<Long, Way> wayCache;
+    private HashMap<Long, Relation> relationCache;
     private XMLReader reader;
     private List<NodeWayRelationBaseObject> objects;
 
     public OSMParser(XMLReader reader) {
         this.reader = reader;
         this.nodeCache = new HashMap<Long, Node>();
+        this.wayCache = new HashMap<Long, Way>();
+        this.relationCache = new HashMap<Long, Relation>();
         this.objects = new LinkedList<NodeWayRelationBaseObject>();
     }
 
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         if (name.equals("node")) {
             // Switch handler to parse the team element
-            reader.setContentHandler(new NodeHandler(reader, nodeCache));
+            reader.setContentHandler(new NodeHandler(reader, nodeCache, objects));
+        }
+        else if (name.equals("way")) {
+            // Switch handler to parse the team element
+            reader.setContentHandler(new WayHandler(reader, nodeCache, objects));
+        }
+        else if (name.equals("relation")) {
+            // Switch handler to parse the team element
+            reader.setContentHandler(new RelationHandler(reader, nodeCache, wayCache, relationCache, objects));
         }
     }
 }

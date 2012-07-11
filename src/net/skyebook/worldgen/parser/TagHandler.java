@@ -7,7 +7,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
+ * Reads an OSM tag
  * @author Skye Book
  */
 public class TagHandler extends DefaultHandler {
