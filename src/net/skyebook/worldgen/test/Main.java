@@ -34,15 +34,6 @@ public class Main extends SimpleApplication {
         // This keeps the camera synchronized with a coordinate system
 	tms = new CamRegistrationTMSAppState(new LatLon(40, -75), 15, 10);
 	stateManager.attach(tms);
-        
-        Box b = new Box(Vector3f.ZERO, 1, 1, 1);
-        Geometry geom = new Geometry("Box", b);
-
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Blue);
-        geom.setMaterial(mat);
-
-        rootNode.attachChild(geom);
     }
 
     @Override
