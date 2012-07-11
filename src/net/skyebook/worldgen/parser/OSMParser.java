@@ -32,6 +32,7 @@ public class OSMParser extends DefaultHandler {
         this.objects = new LinkedList<NodeWayRelationBaseObject>();
     }
 
+    @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         if (name.equals("node")) {
             // Switch handler to parse the team element
@@ -45,5 +46,9 @@ public class OSMParser extends DefaultHandler {
             // Switch handler to parse the team element
             reader.setContentHandler(new RelationHandler(reader, nodeCache, wayCache, relationCache, objects));
         }
+    }
+    
+    public List<NodeWayRelationBaseObject> getObjects(){
+        return objects;
     }
 }
