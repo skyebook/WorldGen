@@ -7,6 +7,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
+import net.skyebook.tmsvec3f.CamRegistrationTMSAppState;
+import net.skyebook.tmsvec3f.LatLon;
 
 /**
  * test
@@ -21,6 +23,14 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        
+        flyCam.setMoveSpeed(512);
+	cam.setFrustumFar(10000);
+        
+        // This keeps the camera synchronized with a coordinate system
+	CamRegistrationTMSAppState tmsAppState = new CamRegistrationTMSAppState(new LatLon(40, -75), 15, 10);
+	stateManager.attach(tmsAppState);
+        
         Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         Geometry geom = new Geometry("Box", b);
 
