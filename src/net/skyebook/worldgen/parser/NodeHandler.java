@@ -42,11 +42,15 @@ public class NodeHandler extends DefaultHandler {
         node.setUid(Integer.parseInt(attributes.getValue("uid")));
         node.setChangeset(Integer.parseInt(attributes.getValue("changeset")));
         node.setVersion(Integer.parseInt(attributes.getValue("version")));
+        node.setVisible(Boolean.parseBoolean(attributes.getValue("visible")));
         // TODO: Visible
         node.setTimestamp(parseDate(attributes.getValue("timestamp")));
 
-        node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
-        node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+        // The OSM API no longer sends position data for deleted nodes
+        if (node.isVisible()) {
+            node.setLatitude(Double.parseDouble(attributes.getValue("lat")));
+            node.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+        }
 
         objects.add(node);
         nodeCache.put(node.getId(), node);
