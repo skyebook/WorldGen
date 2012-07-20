@@ -2,11 +2,9 @@ package net.skyebook.worldgen;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.shape.Box;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import net.skyebook.osmutils.Node;
@@ -14,9 +12,6 @@ import net.skyebook.osmutils.NodeWayRelationBaseObject;
 import net.skyebook.osmutils.Relation;
 import net.skyebook.osmutils.TaggableObject;
 import net.skyebook.osmutils.Way;
-import net.skyebook.tmsvec3f.CoordinateSystem;
-import net.skyebook.tmsvec3f.LatLon;
-import net.skyebook.tmsvec3f.Tile;
 
 /**
  *
@@ -70,7 +65,7 @@ public class GeometryGenerator {
                     // Fire hydrants are 66cm tall.. not sure about their other dimensions
                     Box box = new Box(.25f, .66f, .25f);
                     geometry = new Geometry("fire_hydrant", box);
-                    geometry.setUserData("osm_object", node);
+                    //geometry.setUserData("osm_object", node);
                     geometry.setMaterial(Util.coloredUnshaded(assetManager, ColorRGBA.Red));
                     return geometry;
                 }
@@ -98,22 +93,16 @@ public class GeometryGenerator {
 
     private Geometry renderWay(Way way) {
         if (checkForTag(way, "highway")) {
+            System.out.println("Rendering highway");
             String highwayValue = getValueForTag(way, "highway");
             
             // TODO: Set width depending on tags
-            float width = 10;
+            float width = 5;
             
-            Node firstNode = way.getMembers().get(0);
-            // Create a coordinate system with its origin near this way
-            CoordinateSystem cs = new CoordinateSystem(Tile.getTileNumber(new LatLon(firstNode.getLatitude(), firstNode.getLongitude()), 15));
-            ArrayList<Vector3f> centerLine = new ArrayList<Vector3f>();
-            for(Node node : way.getMembers()){
-                centerLine.add(cs.getLatLonPlacement(new LatLon(node.getLatitude(), node.getLongitude())));
-            }
-            LineStringGenerator lsg = new LineStringGenerator(centerLine, width);
+            LineStringGenerator lsg = new LineStringGenerator(way.getMembers(), width);
             Mesh mesh = lsg.generateMesh();
             Geometry geometry = new Geometry("way_"+way.getId(), mesh);
-            geometry.setUserData("osm_object", way);
+            //geometry.setUserData("osm_object", way);
             geometry.setMaterial(Util.coloredUnshaded(assetManager, ColorRGBA.Gray));
             return geometry;
         }

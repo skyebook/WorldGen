@@ -9,6 +9,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import net.skyebook.osmutils.Node;
+import net.skyebook.tmsvec3f.CoordinateSystem;
+import net.skyebook.tmsvec3f.LatLon;
+import net.skyebook.tmsvec3f.Tile;
 
 /**
  *
@@ -16,15 +20,34 @@ import java.util.List;
  */
 public class LineStringGenerator implements MeshGenerator{
 
-    private List<Vector3f> centerLine;
+    private List<Node> nodeLine;
     private float width;
     
-    public LineStringGenerator(List<Vector3f> centerLine, float width){
-        this.centerLine = centerLine;
+    public LineStringGenerator(List<Node> nodeLine, float width){
+        this.nodeLine = nodeLine;
         this.width = width;
     }
 
     public Mesh generateMesh() {
+        
+        // Create a localized coordinate system and calculate the meshe's offset from the origin
+        Node firstNode = nodeLine.get(0);
+        // TODO: Get extents of node line and use an appropriate tile zoom level
+        CoordinateSystem cs = new CoordinateSystem(Tile.getTileNumber(new LatLon(firstNode.getLatitude(), firstNode.getLongitude()), 15));
+        Vector3f offset = cs.getLatLonPlacement(new LatLon(firstNode.getLatitude(), firstNode.getLongitude()));
+        
+        System.out.println("OFFSET: " + offset);
+        
+        List<Vector3f> centerLine = new ArrayList<Vector3f>();
+        
+        for(Node node : nodeLine){
+            Vector3f point = cs.getLatLonPlacement(new LatLon(node.getLatitude(), node.getLongitude()));
+            point.subtractLocal(offset);
+            centerLine.add(point);
+        }
+        
+        
+        
         // storage vectors
         Vector3f tempDir = new Vector3f();
         Vector3f tempLoc = new Vector3f();
