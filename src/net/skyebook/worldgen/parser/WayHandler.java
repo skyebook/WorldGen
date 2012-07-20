@@ -58,10 +58,9 @@ public class WayHandler extends DefaultHandler {
         content.setLength(0);
 
         if (name.equals("tag")) {
-            reader.setContentHandler(new TagHandler(reader, this, way.getTags()));
+            reader.setContentHandler(new TagHandler(reader, this, way.getTags(), attributes));
         }
         if (name.equals("nd")) {
-            //System.out.println("Found Way Member");
             long nodeID = Long.parseLong(attributes.getValue("ref"));
             Node node = nodeCache.get(nodeID);
             if (node != null) {

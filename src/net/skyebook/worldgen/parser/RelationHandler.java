@@ -63,7 +63,7 @@ public class RelationHandler extends DefaultHandler {
         content.setLength(0);
 
         if (name.equals("tag")) {
-            reader.setContentHandler(new TagHandler(reader, this, relation.getTags()));
+            reader.setContentHandler(new TagHandler(reader, this, relation.getTags(), attributes));
         }
         if (name.equals("member")) {
             //System.out.println("Found Relation Member");

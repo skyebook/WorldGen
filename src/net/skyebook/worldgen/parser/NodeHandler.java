@@ -67,7 +67,7 @@ public class NodeHandler extends DefaultHandler {
         //System.out.println("Node Start " + name);
         if (name.equals("tag")) {
             //System.out.println("Found Tag");
-            reader.setContentHandler(new TagHandler(reader, this, node.getTags()));
+            reader.setContentHandler(new TagHandler(reader, this, node.getTags(), attributes));
         }
         if (name.equals("node")) {
         }

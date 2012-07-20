@@ -16,17 +16,18 @@ public class TagHandler extends DefaultHandler {
     private DefaultHandler parent;
     private HashMap<String, String> tags;
 
-    public TagHandler(XMLReader reader, DefaultHandler parent, HashMap<String, String> tags) {
+    public TagHandler(XMLReader reader, DefaultHandler parent, HashMap<String, String> tags, Attributes attributes) {
         this.reader = reader;
         this.parent = parent;
         this.tags = tags;
+        
+        String key = attributes.getValue("k");
+        String value = attributes.getValue("v");
+        tags.put(key, value);
     }
 
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
-        String key = attributes.getValue("k");
-        String value = attributes.getValue("v");
-        tags.put(key, value);
     }
     
     @Override
