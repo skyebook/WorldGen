@@ -97,7 +97,7 @@ public class GeometryGenerator {
             String highwayValue = getValueForTag(way, "highway");
             
             // TODO: Set width depending on tags
-            float width = 5;
+            float width = 10;
             
             LineStringGenerator lsg = new LineStringGenerator(way.getMembers(), width);
             Mesh mesh = lsg.generateMesh();

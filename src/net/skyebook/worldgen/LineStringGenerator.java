@@ -21,11 +21,11 @@ import net.skyebook.tmsvec3f.Tile;
 public class LineStringGenerator implements MeshGenerator{
 
     private List<Node> nodeLine;
-    private float width;
+    private float realWorldWidth;
     
-    public LineStringGenerator(List<Node> nodeLine, float width){
+    public LineStringGenerator(List<Node> nodeLine, float realWorldWidth){
         this.nodeLine = nodeLine;
-        this.width = width;
+        this.realWorldWidth = realWorldWidth;
     }
 
     public Mesh generateMesh() {
@@ -36,7 +36,7 @@ public class LineStringGenerator implements MeshGenerator{
         CoordinateSystem cs = new CoordinateSystem(Tile.getTileNumber(new LatLon(firstNode.getLatitude(), firstNode.getLongitude()), 15));
         Vector3f offset = cs.getLatLonPlacement(new LatLon(firstNode.getLatitude(), firstNode.getLongitude()));
         
-        System.out.println("OFFSET: " + offset);
+        //System.out.println("OFFSET: " + offset);
         
         List<Vector3f> centerLine = new ArrayList<Vector3f>();
         
@@ -46,8 +46,6 @@ public class LineStringGenerator implements MeshGenerator{
             centerLine.add(point);
         }
         
-        
-        
         // storage vectors
         Vector3f tempDir = new Vector3f();
         Vector3f tempLoc = new Vector3f();
@@ -56,6 +54,14 @@ public class LineStringGenerator implements MeshGenerator{
 
         for (int i = 0; i < centerLine.size(); i++) {
             Vector3f thisPoint = centerLine.get(i);
+            Node thisNode = nodeLine.get(i);
+            
+            float metersPerUnit = (float) cs.getMetersPerPixelAt(new LatLon(thisNode.getLatitude(), thisNode.getLongitude()), cs.getOriginTile().getZ());
+            System.out.println("meters per unit at latitude("+thisNode.getLatitude()+") and zoom level "+cs.getOriginTile().getZ()+": " + metersPerUnit);
+            float glWidth = realWorldWidth*metersPerUnit;
+            
+            System.out.println("Calculated GL width: " + glWidth);
+            //glWidth = realWorldWidth;
 
             // if this is the first point, generate the starting left/right points
             if (i == 0) {
@@ -66,10 +72,10 @@ public class LineStringGenerator implements MeshGenerator{
                 tempDir.crossLocal(Vector3f.UNIT_Y);
 
                 // create the left vertex
-                thisPoint.clone().add(tempDir.mult(-1 * (width / 2)), tempLoc);
+                thisPoint.clone().add(tempDir.mult(-1 * (glWidth / 2)), tempLoc);
                 vertices.add(tempLoc.clone());
                 // create the right vertex
-                thisPoint.clone().add(tempDir.mult(width / 2), tempLoc);
+                thisPoint.clone().add(tempDir.mult(glWidth / 2), tempLoc);
                 vertices.add(tempLoc.clone());
             }
 
@@ -86,10 +92,10 @@ public class LineStringGenerator implements MeshGenerator{
                 /* create an angle to the left of the second point
                  * using the direction between the first and third angles */
                 // create the left vertex
-                secondPoint.clone().add(tempDir.mult(-1 * (width / 2)), tempLoc);
+                secondPoint.clone().add(tempDir.mult(-1 * (glWidth / 2)), tempLoc);
                 vertices.add(tempLoc.clone());
                 // create the right vertex
-                secondPoint.clone().add(tempDir.mult(width / 2), tempLoc);
+                secondPoint.clone().add(tempDir.mult(glWidth / 2), tempLoc);
                 vertices.add(tempLoc.clone());
             }
             else if (i == centerLine.size() - 2) {
@@ -101,19 +107,19 @@ public class LineStringGenerator implements MeshGenerator{
                 tempDir.crossLocal(Vector3f.UNIT_Y);
 
                 // create the left vertex
-                thisPoint.clone().add(tempDir.mult(-1 * (width / 2)), tempLoc);
+                thisPoint.clone().add(tempDir.mult(-1 * (glWidth / 2)), tempLoc);
                 vertices.add(tempLoc.clone());
                 // create the right vertex
-                thisPoint.clone().add(tempDir.mult(width / 2), tempLoc);
+                thisPoint.clone().add(tempDir.mult(glWidth / 2), tempLoc);
                 vertices.add(tempLoc.clone());
             }
             else {
                 // this is the last point, use the previously set direction to find left&right points
 
-                thisPoint.clone().add(tempDir.mult(-1 * (width / 2)), tempLoc);
+                thisPoint.clone().add(tempDir.mult(-1 * (glWidth / 2)), tempLoc);
                 vertices.add(tempLoc.clone());
                 // create the right vertex
-                thisPoint.clone().add(tempDir.mult(width / 2), tempLoc);
+                thisPoint.clone().add(tempDir.mult(glWidth / 2), tempLoc);
                 vertices.add(tempLoc.clone());
             }
         }

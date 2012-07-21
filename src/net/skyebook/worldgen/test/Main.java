@@ -50,7 +50,7 @@ public class Main extends SimpleApplication {
             for (NodeWayRelationBaseObject object : objects) {
                 Geometry geometry = generator.renderGeometry(object);
                 if (geometry != null) {
-                    System.out.println("Adding " + geometry.getName());
+                    //System.out.println("Adding " + geometry.getName());
 
                     LatLon mountCoordinate = null;
                     if (object instanceof Node) {
@@ -64,7 +64,7 @@ public class Main extends SimpleApplication {
 
                     if (mountCoordinate != null) {
                         Vector3f mountPoint = tms.getCoordinateSystem().getLatLonPlacement(mountCoordinate);
-                        System.out.println("Mounting At " + mountPoint);
+                        //System.out.println("Mounting At " + mountPoint);
                         geometry.setLocalTranslation(mountPoint);
                         rootNode.attachChild(geometry);
                     }
